@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Universal Unit Conversion Web App v7</title>
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --primary-hover: #4338ca;
+      --secondary-color: #10b981;
+      --danger-color: #ef4444;
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-color: #1f2937;
+      --border-color: #d1d5db;
+      --muted: #6b7280;
+      --panel: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: var(--text-color);
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      padding: 35px;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      margin: 0 0 25px;
+      text-align: center;
+      background: linear-gradient(135deg, #4f46e5 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .category-select {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    select, input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 15px;
+      background: #fff;
+      color: var(--text-color);
+      transition: border-color 0.2s;
+    }
+
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .row {
+      display: flex;
+      gap: 15px;
+      align-items: flex-end;
+    }
+
+    .col {
+      flex: 1;
+    }
+
+    .swap-btn {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .swap-btn:hover {
+      background-color: #059669;
+    }
+
+    .swap-indicator {
+      text-align: center;
+      font-size: 24px;
+      margin: 10px 0;
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
+    .buttons-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .btn-clear {
+      background-color: var(--danger-color);
+    }
+
+    .btn-clear:hover {
+      background-color: #dc2626;
+    }
+
+    .btn-swap-units {
+      background-color: var(--secondary-color);
+      padding: 12px;
+      font-size: 18px;
+    }
+
+    .btn-swap-units:hover {
+      background-color: #059669;
+    }
+
+    #status-msg {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--muted);
+      min-height: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .rate-section {
+      background-color: var(--panel);
+      padding: 15px;
+      border-radius: 10px;
+      border: 2px solid #e5e7eb;
+      margin-top: 20px;
+    }
+
+    .rate-section button {
+      margin: 0;
+    }
+
+    .info-bar {
+      background-color: #eff6ff;
+      border-left: 4px solid var(--primary-color);
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin-top: 15px;
+      font-size: 13px;
+      color: #1e3a8a;
+      display: none;
+    }
+
+    .info-bar.show {
+      display: block;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 22px;
+        margin-bottom: 20px;
+      }
+
+      .row {
+        flex-direction: column;
+      }
+
+      .swap-btn {
+        width: 100%;
+        margin-top: 5px;
+      }
+
+      .buttons-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚡ 通用單位轉換器 v7</h1>
+
+    <div class="category-select">
+      <label for="category">🔍 選擇轉換類別：</label>
+      <select id="category" onchange="updateUnits()">
+        <option value="currency">💵 匯率 (Currency)</option>
+        <option value="length">📏 長度 (Length)</option>
+        <option value="mass">⚖️ 質量/重量 (Mass)</option>
+        <option value="volume">🧪 體積 (Volume)</option>
+        <option value="temperature">🌡️ 溫度 (Temperature)</option>
+        <option value="area">📐 面積 (Area)</option>
+        <option value="pressure">🔊 壓力 (Pressure)</option>
+        <option value="power">⚙️ 功率 (Power)</option>
+        <option value="energy">⚡ 能量 (Energy)</option>
+      </select>
+    </div>
+
+    <div id="currency-update-panel" class="rate-section" style="display: none;">
+      <button onclick="fetchExchangeRates()" style="width: 100%; margin: 0;">🌐 更新即時匯率</button>
+      <div id="status-msg">點擊上方按鈕聯網更新最新匯率</div>
+    </div>
+
+    <div class="row" style="margin-top: 20px;">
+      <div class="col">
+        <label for="val1">📊 輸入數值：</label>
+        <input type="number" id="val1" placeholder="輸入數值" oninput="convert(1)" />
+      </div>
+      <div class="col">
+        <label for="unit1">單位：</label>
+        <select id="unit1" onchange="convert(1)"></select>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: center; margin: 10px 0;">
+      <button class="swap-btn" onclick="swapUnits()" title="交換單位">⇄</button>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label for="val2">📈 轉換結果：</label>
+        <input type="number" id="val2" placeholder="計算結果" oninput="convert(2)" />
+      </div>
+      <div class="col">
+        <label for="unit2">單位：</label>
+        <select id="unit2" onchange="convert(1)"></select>
+      </div>
+    </div>
+
+    <div class="buttons-row">
+      <button class="btn-clear" onclick="clearInputs()">🗑️ 清除</button>
+    </div>
+
+    <div id="infoBar" class="info-bar"></div>
+  </div>
+
+  <script>
+    const unitData = {
+      currency: {
+        base: 'USD',
+        units: {
+          USD: { name: '美元 (USD)', rate: 1.0 },
+          TWD: { name: '新台幣 (TWD)', rate: 32.5 },
+          EUR: { name: '歐元 (EUR)', rate: 0.92 },
+          JPY: { name: '日圓 (JPY)', rate: 150.0 },
+          CNY: { name: '人民幣 (CNY)', rate: 7.2 },
+          GBP: { name: '英鎊 (GBP)', rate: 0.78 }
+        }
+      },
+      length: {
+        base: 'm',
+        units: {
+          m: { name: '公尺 (m)', rate: 1.0 },
+          cm: { name: '公分 (cm)', rate: 0.01 },
+          mm: { name: '公釐 (mm)', rate: 0.001 },
+          km: { name: '公里 (km)', rate: 1000.0 },
+          inch: { name: '英吋 (in)', rate: 0.0254 },
+          ft: { name: '英尺 (ft)', rate: 0.3048 },
+          mi: { name: '英里 (mi)', rate: 1609.344 }
+        }
+      },
+      mass: {
+        base: 'kg',
+        units: {
+          kg: { name: '公斤 (kg)', rate: 1.0 },
+          g: { name: '公克 (g)', rate: 0.001 },
+          mg: { name: '毫克 (mg)', rate: 0.000001 },
+          lb: { name: '磅 (pound)', rate: 0.45359237 },
+          ounce: { name: '盎司 (ounce)', rate: 0.028349523125 },
+          tael: { name: '台港兩 (兩)', rate: 0.0375 },
+          t: { name: '公噸 (t)', rate: 1000.0 }
+        }
+      },
+      volume: {
+        base: 'l',
+        units: {
+          l: { name: '公升 (liter, L)', rate: 1.0 },
+          ml: { name: '毫升 (mL)', rate: 0.001 },
+          m3: { name: '立方公尺 (m³)', rate: 1000.0 },
+          gal: { name: '美制加侖 (gal)', rate: 3.78541 },
+          quart: { name: '夸脫 (quart)', rate: 0.946353 },
+          pint: { name: '品脫 (pint)', rate: 0.473176 }
+        }
+      },
+      temperature: {
+        isSpecial: true,
+        units: {
+          c: { name: '攝氏 (°C)' },
+          f: { name: '華氏 (°F)' },
+          k: { name: '開氏 (K)' },
+          r: { name: '蘭氏 (°R)' },
+          wong: { name: '王氏溫標 (°W)' }
+        }
+      },
+      area: {
+        base: 'm2',
+        units: {
+          m2: { name: '平方公尺 (m²)', rate: 1.0 },
+          ping: { name: '坪', rate: 3.305785 },
+          hectare: { name: '公頃', rate: 10000.0 },
+          are: { name: '公畝', rate: 100.0 },
+          acre: { name: '英畝 (acre)', rate: 4046.8564224 },
+          li: { name: '犁 (傳統面積單位)', rate: 39669.4 }
+        }
+      },
+      pressure: {
+        base: 'pa',
+        units: {
+          pa: { name: '帕斯卡 (Pa)', rate: 1.0 },
+          mpa: { name: '百萬帕 (MPa)', rate: 1000000.0 },
+          bar: { name: '巴 (bar)', rate: 100000.0 },
+          atm: { name: '標準大氣壓 (atm)', rate: 101325.0 },
+          psi: { name: '磅/平方英吋 (psi)', rate: 6894.76 },
+          torr: { name: '托 (Torr / mmHg)', rate: 133.322 },
+          kgcm2: { name: '公斤力/平方公分 (kgf/cm²)', rate: 98066.5 }
+        }
+      },
+      power: {
+        base: 'w',
+        units: {
+          w: { name: '瓦特 (W)', rate: 1.0 },
+          kw: { name: '千瓦 (kW)', rate: 1000.0 },
+          hp: { name: '馬力 (hp)', rate: 745.7 },
+          btuh: { name: '英熱單位/小時 (BTU/h)', rate: 0.29307107 }
+        }
+      },
+      energy: {
+        base: 'j',
+        units: {
+          j: { name: '焦耳 (J)', rate: 1.0 },
+          kj: { name: '千焦 (kJ)', rate: 1000.0 },
+          kwh: { name: '度電 (kWh)', rate: 3600000.0 },
+          ev: { name: '電子伏特 (eV)', rate: 1.602176634e-19 },
+          cal: { name: '卡路里 (cal)', rate: 4.184 },
+          kcal: { name: '大卡 (kcal)', rate: 4184.0 }
+        }
+      }
+    };
+
+    let exchangeRatesCached = false;
+    let lastFetchTime = 0;
+
+    function updateUnits() {
+      const category = document.getElementById('category').value;
+      const unit1 = document.getElementById('unit1');
+      const unit2 = document.getElementById('unit2');
+      const currencyPanel = document.getElementById('currency-update-panel');
+
+      currencyPanel.style.display = category === 'currency' ? 'block' : 'none';
+
+      unit1.innerHTML = '';
+      unit2.innerHTML = '';
+
+      const units = unitData[category].units;
+
+      for (const key in units) {
+        const opt1 = document.createElement('option');
+        opt1.value = key;
+        opt1.textContent = units[key].name;
+        unit1.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = key;
+        opt2.textContent = units[key].name;
+        unit2.appendChild(opt2);
+      }
+
+      if (unit2.options.length > 1) {
+        unit2.selectedIndex = 1;
+      }
+
+      convert(1);
+    }
+
+    function convertTemperature(val, from, to) {
+      let celsius;
+
+      switch (from) {
+        case 'c':
+          celsius = val;
+          break;
+        case 'f':
+          celsius = (val - 32) * 5 / 9;
+          break;
+        case 'k':
+          celsius = val - 273.15;
+          break;
+        case 'r':
+          celsius = (val - 491.67) * 5 / 9;
+          break;
+        case 'wong':
+          celsius = (val - 10) / 1.5;
+          break;
+        default:
+          celsius = val;
+      }
+
+      switch (to) {
+        case 'c':
+          return celsius;
+        case 'f':
+          return celsius * 9 / 5 + 32;
+        case 'k':
+          return celsius + 273.15;
+        case 'r':
+          return (celsius + 273.15) * 9 / 5;
+        case 'wong':
+          return celsius * 1.5 + 10;
+        default:
+          return celsius;
+      }
+    }
+
+    function convert(direction) {
+      const category = document.getElementById('category').value;
+      const val1Input = document.getElementById('val1');
+      const val2Input = document.getElementById('val2');
+      const unit1 = document.getElementById('unit1').value;
+      const unit2 = document.getElementById('unit2').value;
+
+      if (category === 'temperature') {
+        if (direction === 1) {
+          const v = parseFloat(val1Input.value);
+          if (isNaN(v)) { val2Input.value = ''; return; }
+          val2Input.value = parseFloat(convertTemperature(v, unit1, unit2).toFixed(4));
+        } else {
+          const v = parseFloat(val2Input.value);
+          if (isNaN(v)) { val1Input.value = ''; return; }
+          val1Input.value = parseFloat(convertTemperature(v, unit2, unit1).toFixed(4));
+        }
+      } else {
+        const units = unitData[category].units;
+        if (direction === 1) {
+          const v = parseFloat(val1Input.value);
+          if (isNaN(v)) { val2Input.value = ''; return; }
+          const baseVal = v * units[unit1].rate;
+          const res = baseVal / units[unit2].rate;
+          val2Input.value = parseFloat(res.toPrecision(8));
+        } else {
+          const v = parseFloat(val2Input.value);
+          if (isNaN(v)) { val1Input.value = ''; return; }
+          const baseVal = v * units[unit2].rate;
+          const res = baseVal / units[unit1].rate;
+          val1Input.value = parseFloat(res.toPrecision(8));
+        }
+      }
+    }
+
+    function swapUnits() {
+      const unit1 = document.getElementById('unit1');
+      const unit2 = document.getElementById('unit2');
+      const val1 = document.getElementById('val1');
+      const val2 = document.getElementById('val2');
+
+      [unit1.value, unit2.value] = [unit2.value, unit1.value];
+      [val1.value, val2.value] = [val2.value, val1.value];
+
+      convert(1);
+    }
+
+    function clearInputs() {
+      document.getElementById('val1').value = '';
+      document.getElementById('val2').value = '';
+    }
+
+    function showInfo(message) {
+      const infoBar = document.getElementById('infoBar');
+      infoBar.textContent = message;
+      infoBar.classList.add('show');
+      setTimeout(() => infoBar.classList.remove('show'), 3000);
+    }
+
+    async function fetchExchangeRates() {
+      const statusMsg = document.getElementById('status-msg');
+      const now = Date.now();
+
+      if (exchangeRatesCached && (now - lastFetchTime) < 5 * 60 * 1000) {
+        statusMsg.textContent = '✔ 使用已快取的匯率資料（距離更新不足 5 分鐘）';
+        return;
+      }
+
+      statusMsg.textContent = '⏳ 正在聯網取得最新匯率...';
+
+      try {
+        const response = await fetch('https://open.er-api.com/v6/latest/USD', {
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data && data.rates) {
+          unitData.currency.units.USD.rate = 1.0;
+          unitData.currency.units.TWD.rate = data.rates.TWD;
+          unitData.currency.units.EUR.rate = data.rates.EUR;
+          unitData.currency.units.JPY.rate = data.rates.JPY;
+          unitData.currency.units.CNY.rate = data.rates.CNY;
+          unitData.currency.units.GBP.rate = data.rates.GBP;
+
+          exchangeRatesCached = true;
+          lastFetchTime = now;
+
+          statusMsg.textContent = '✔ 匯率已成功更新！ (資料來源: Open ER-API)';
+          convert(1);
+          showInfo('💵 匯率更新成功！所有轉換已套用最新匯率。');
+        } else {
+          throw new Error('API 回應格式錯誤');
+        }
+      } catch (error) {
+        console.error('匯率更新失敗:', error);
+        statusMsg.textContent = `⚠️ 更新失敗：${error.message}。使用預設匯率。`;
+        showInfo('⚠️ 無法連線到匯率服務，已使用離線預設值。');
+      }
+    }
+
+    window.onload = function() {
+      updateUnits();
+    };
+  </script>
+</body>
+</html>
